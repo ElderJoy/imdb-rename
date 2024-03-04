@@ -78,7 +78,7 @@ impl Index {
         });
         for episode in &episodes {
             buf.clear();
-            write_tvshow(&episode, &mut buf)?;
+            write_tvshow(episode, &mut buf)?;
             tvshows.insert(&buf).map_err(Error::fst)?;
         }
 
@@ -146,7 +146,7 @@ impl Index {
 
         let mut stream =
             self.tvshows.range().ge(episode_id).le(upper).into_stream();
-        while let Some(tvshow_bytes) = stream.next() {
+        if let Some(tvshow_bytes) = stream.next() {
             return Ok(Some(read_tvshow(tvshow_bytes)?));
         }
         Ok(None)

@@ -106,6 +106,7 @@ impl fmt::Display for Error {
 
 /// The specific kind of error that can occur.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum ErrorKind {
     /// An index version mismatch. This error occurs when the version of the
     /// index is different from the version supported by this version of
@@ -159,13 +160,6 @@ pub enum ErrorKind {
     },
     /// An error occurred while parsing a number in a free-form query.
     Number(Box<dyn std::error::Error + Send + Sync>),
-    /// Hints that destructuring should not be exhaustive.
-    ///
-    /// This enum may grow additional variants, so this makes sure clients
-    /// don't count on exhaustive matching. (Otherwise, adding a new variant
-    /// could break existing code.)
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl fmt::Display for ErrorKind {
@@ -205,7 +199,6 @@ impl fmt::Display for ErrorKind {
                 write!(f, "{}", p.display())
             }
             ErrorKind::Number(_) => write!(f, "error parsing number"),
-            ErrorKind::__Nonexhaustive => panic!("invalid error"),
         }
     }
 }

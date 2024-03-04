@@ -1017,7 +1017,7 @@ impl IndexWriter {
         // We could use a BTreeMap and get out our keys in sorted order, but
         // the overhead of inserting into the BTreeMap dwarfs the savings we
         // get from pre-sorted keys.
-        ngram_to_postings.sort_by(|&(ref t1, _), &(ref t2, _)| t1.cmp(t2));
+        ngram_to_postings.sort_by(|(t1, _), (t2, _)| t1.cmp(t2));
 
         for (term, postings) in ngram_to_postings {
             let pos = self.postings.position() as u64;
@@ -1123,10 +1123,11 @@ impl Postings {
 ///
 /// The default is OkapiBM25. If you aren't sure which scorer to use, then
 /// stick with the default.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Default)]
 pub enum NameScorer {
     /// OkapiBM25 is a TF-IDF-like ranking function, which takes name length
     /// into account.
+    #[default]
     OkapiBM25,
     /// TFIDF is the traditional TF-IDF ranking function, which does not
     /// incorporate document length.
@@ -1161,12 +1162,6 @@ impl NameScorer {
     }
 }
 
-impl Default for NameScorer {
-    fn default() -> NameScorer {
-        NameScorer::OkapiBM25
-    }
-}
-
 impl fmt::Display for NameScorer {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.as_str())
@@ -1197,7 +1192,9 @@ impl FromStr for NameScorer {
 /// All ngram styles used Unicode codepoints as the definition of a character.
 /// For example, a 3-gram might contain up to 4 bytes, if it contains 3 Unicode
 /// codepoints that each require 4 UTF-8 code units.
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize, Default,
+)]
 pub enum NgramType {
     /// A windowing ngram.
     ///
@@ -1205,6 +1202,7 @@ pub enum NgramType {
     /// `N` is moved across the entire content to be index. For example, the
     /// 3-grams for the string `homer` are hom, ome and mer.
     #[serde(rename = "window")]
+    #[default]
     Window,
     /// An edge ngram.
     ///
@@ -1291,12 +1289,6 @@ impl NgramType {
                 }
             }
         }
-    }
-}
-
-impl Default for NgramType {
-    fn default() -> NgramType {
-        NgramType::Window
     }
 }
 

@@ -117,10 +117,7 @@ impl TitleKind {
     pub fn is_tv_series(&self) -> bool {
         use self::TitleKind::*;
 
-        match *self {
-            TVMiniSeries | TVSeries => true,
-            _ => false,
-        }
+        matches!(*self, TVMiniSeries | TVSeries)
     }
 }
 

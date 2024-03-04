@@ -139,7 +139,7 @@ impl Args {
             matches
                 .values_of_os("file")
                 .map(|it| it.collect())
-                .unwrap_or(vec![]),
+                .unwrap_or_default(),
             matches.is_present("follow"),
         );
         let query = matches.value_of_lossy("query").map(|q| q.into_owned());
@@ -174,16 +174,16 @@ impl Args {
         };
         let regions = matches
             .values_of_lossy("region")
-            .unwrap_or(vec![])
+            .unwrap_or_default()
             .into_iter()
             .map(|s| s.to_uppercase())
             .collect();
         Ok(Args {
-            data_dir: data_dir,
-            dest_dir: dest_dir,
+            data_dir,
+            dest_dir,
             debug: matches.is_present("debug"),
-            files: files,
-            index_dir: index_dir,
+            files,
+            index_dir,
             ngram_size: matches
                 .value_of_lossy("ngram-size")
                 .unwrap()
@@ -192,15 +192,15 @@ impl Args {
                 .value_of_lossy("ngram-type")
                 .unwrap()
                 .parse()?,
-            query: query,
-            regex_episode: regex_episode,
-            regex_season: regex_season,
-            regex_year: regex_year,
+            query,
+            regex_episode,
+            regex_season,
+            regex_year,
             update_data: matches.is_present("update-data"),
             update_index: matches.is_present("update-index"),
-            min_votes: min_votes,
-            rename_action: rename_action,
-            regions: regions,
+            min_votes,
+            rename_action,
+            regions,
         })
     }
 

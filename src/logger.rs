@@ -17,7 +17,7 @@ pub fn init() -> anyhow::Result<()> {
 #[derive(Debug)]
 struct Logger(());
 
-const LOGGER: &'static Logger = &Logger(());
+const LOGGER: &Logger = &Logger(());
 
 impl Logger {
     /// Create a new logger that logs to stderr and initialize it as the

@@ -72,7 +72,7 @@ impl Index {
         upper.push(0xFF);
 
         let mut stream = self.idx.range().ge(id).le(upper).into_stream();
-        while let Some(rating_bytes) = stream.next() {
+        if let Some(rating_bytes) = stream.next() {
             return Ok(Some(read_rating(rating_bytes)?));
         }
         Ok(None)

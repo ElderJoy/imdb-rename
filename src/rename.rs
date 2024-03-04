@@ -381,7 +381,7 @@ impl Renamer {
                 tvshow.title().id,
             ),
         };
-        match searcher.index().entity(&ep.id, &vec![])? {
+        match searcher.index().entity(&ep.id, &[])? {
             Some(ent) => Ok(ent),
             None => anyhow::bail!(
                 "could not find media entity for episode {}",
@@ -529,7 +529,7 @@ impl Renamer {
     /// Build a query and seed it with the given name, after sanitizing the
     /// name.
     fn name_query(&self, name: &str) -> Query {
-        let name = name.replace(".", " ");
+        let name = name.replace('.', " ");
         let name = name.trim();
         log::debug!("automatic name query: {:?}", name);
         Query::new().name(name)

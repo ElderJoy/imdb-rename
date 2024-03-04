@@ -102,7 +102,7 @@ impl Searcher {
             }
         }
         if !query.similarity.is_none() {
-            results.rescore(|e| self.similarity(query, &e.best_title()));
+            results.rescore(|e| self.similarity(query, e.best_title()));
         }
         Ok(results)
     }
@@ -163,7 +163,7 @@ impl Searcher {
                     results.push(Scored::new(entity));
                 }
             }
-            results.rescore(|e| self.similarity(query, &e.best_title()));
+            results.rescore(|e| self.similarity(query, e.best_title()));
             Ok(results)
         }
     }
@@ -184,7 +184,7 @@ impl Searcher {
             }
         }
         if !query.similarity.is_none() {
-            results.rescore(|e| self.similarity(query, &e.best_title()));
+            results.rescore(|e| self.similarity(query, e.best_title()));
         }
         Ok(results)
     }
@@ -445,7 +445,7 @@ impl Query {
     /// Note that this only applies filters in this query. e.g., The name
     /// aspect of the query, if one exists, is ignored.
     fn matches(&self, ent: &MediaEntity) -> bool {
-        self.matches_title(&ent.title())
+        self.matches_title(ent.title())
             && self.matches_rating(ent.rating())
             && self.matches_episode(ent.episode())
     }
@@ -551,7 +551,7 @@ impl Query {
     fn needs_episode(&self) -> bool {
         !self.season.is_none()
             || !self.episode.is_none()
-            || !self.tvshow_id.is_none()
+            || self.tvshow_id.is_some()
     }
 }
 
@@ -704,9 +704,10 @@ impl fmt::Display for Query {
 /// the IMDb name index will be rescored according to this function. If no
 /// similarity function is provided, then the results will be ranked according
 /// to scores produced by the name index.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Default)]
 pub enum Similarity {
     /// Do not use a similarity function.
+    #[default]
     None,
     /// Computes the Levenshtein edit distance between two names and converts
     /// it to a similarity.
@@ -763,12 +764,6 @@ impl Similarity {
     }
 }
 
-impl Default for Similarity {
-    fn default() -> Similarity {
-        Similarity::None
-    }
-}
-
 impl fmt::Display for Similarity {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
@@ -821,9 +816,9 @@ impl<T: PartialOrd> Range<T> {
         };
         match (&self.start, &self.end) {
             (&None, &None) => true,
-            (&Some(ref s), &None) => s <= t,
-            (&None, &Some(ref e)) => t <= e,
-            (&Some(ref s), &Some(ref e)) => s <= t && t <= e,
+            (Some(s), &None) => s <= t,
+            (&None, Some(e)) => t <= e,
+            (Some(s), Some(e)) => s <= t && t <= e,
         }
     }
 }
@@ -832,10 +827,10 @@ impl<T: fmt::Display + PartialEq> fmt::Display for Range<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match (&self.start, &self.end) {
             (&None, &None) => write!(f, "-"),
-            (&Some(ref s), &None) => write!(f, "{}-", s),
-            (&None, &Some(ref e)) => write!(f, "-{}", e),
-            (&Some(ref s), &Some(ref e)) if s == e => write!(f, "{}", s),
-            (&Some(ref s), &Some(ref e)) => write!(f, "{}-{}", s, e),
+            (Some(s), &None) => write!(f, "{}-", s),
+            (&None, Some(e)) => write!(f, "-{}", e),
+            (Some(s), Some(e)) if s == e => write!(f, "{}", s),
+            (Some(s), Some(e)) => write!(f, "{}-{}", s, e),
         }
     }
 }

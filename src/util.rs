@@ -20,9 +20,10 @@ pub fn choose(
 ) -> anyhow::Result<MediaEntity> {
     if results.is_empty() {
         anyhow::bail!("no search results available for query");
-    } else if results.len() == 1 {
-        return Ok(results[0].clone().into_value());
-    } else if (results[0].score() - results[1].score()) >= good_threshold {
+    }
+    if results.len() == 1
+        || (results[0].score() - results[1].score()) >= good_threshold
+    {
         return Ok(results[0].clone().into_value());
     }
 
@@ -120,7 +121,7 @@ fn write_tsv_title<W: io::Write>(
             .map(|y| y.to_string())
             .unwrap_or("N/A".to_string()),
     )?;
-    write!(wtr, "\n")?;
+    writeln!(wtr)?;
     Ok(())
 }
 
@@ -152,6 +153,6 @@ fn write_tsv_episode<W: io::Write>(
             .unwrap_or("N/A".to_string()),
         tvinfo,
     )?;
-    write!(wtr, "\n")?;
+    writeln!(wtr)?;
     Ok(())
 }

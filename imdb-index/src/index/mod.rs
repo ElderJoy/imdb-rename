@@ -619,7 +619,7 @@ fn create_name_index(
         // Now index all of the alternate names, if they exist.
         for result in aka_index.find(id.as_bytes())? {
             let akarecord = result?;
-            if !titles.contains(&&akarecord.title) {
+            if !titles.contains(&akarecord.title) {
                 wtr.insert(pos.byte(), &akarecord.title)?;
                 count += 1;
                 titles.push(akarecord.title);
